@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1774436844547,
+    "learned": "i have learned about apis",
+    "challenges": "i had a bit of a hard time using postman",
+    "createdAt": "2026-03-25T11:07:24.551Z"
+  },
+  {
+    "id": 1774356838256,
+    "learned": "i learned how next.js based routes and urls",
+    "challenges": "i struggled understabnding React state",
+    "createdAt": "2026-03-24T12:53:58.258Z"
+  }
+]
