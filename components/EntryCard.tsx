@@ -5,11 +5,7 @@ type Entry = {
   createdAt: string
 }
 
-function formatUtc(createdAt: string) {
-  const date = new Date(createdAt)
-  if (Number.isNaN(date.getTime())) return createdAt
-  return `${date.toISOString().slice(0, 19).replace("T", " ")} UTC`
-}
+import { formatKenyaDateTime } from "@/lib/date"
 
 function difficultyFromText(text: string) {
   const len = text.trim().length
@@ -33,7 +29,7 @@ export function EntryCard({
   onDelete,
 }: {
   entry: Entry
-  tags: string[]
+  tags?: string[]
   isEditing: boolean
   editLearned: string
   editChallenges: string
@@ -45,12 +41,13 @@ export function EntryCard({
   onDelete: () => void
 }) {
   const difficulty = difficultyFromText(entry.challenges)
+  const safeTags = tags ?? []
 
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <p className="text-xs font-medium text-slate-500">{formatUtc(entry.createdAt)}</p>
+          <p className="text-xs font-medium text-slate-500">{formatKenyaDateTime(entry.createdAt)}</p>
           <span
             className={[
               "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1",
@@ -135,16 +132,18 @@ export function EntryCard({
           </>
         )}
 
-        <div className="flex flex-wrap gap-2">
-          {tags.map((tag) => (
-            <span
-              key={`${entry.id}-${tag}`}
-              className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
+        {safeTags.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {safeTags.map((tag) => (
+              <span
+                key={`${entry.id}-${tag}`}
+                className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   )
