@@ -53,9 +53,12 @@ TypeScript is JavaScript **plus types**.
   - API routes: `app/api/entries/route.ts`, `app/api/insights/route.ts`, `app/api/export/route.ts`
 - `components/` contains reusable dashboard UI components:
   - `Sidebar`, `DashboardLayout`, `StatsCard`, `EntryCard`, `InsightCard`
+  - `InsightsSummaryCard`, `InsightMetricsCard`, `InsightListCard`
 - `lib/` contains persistence helpers:
   - `lib/entries-store.ts` for `data/entries.json`
   - `lib/insights-store.ts` for `data/insights.json`
+  - `lib/insights-types.ts` for shared insight report types
+  - `lib/date.ts` for consistent Kenya time formatting in UI
 
 ### One real-world example (how the app works)
 1. User submits the "Add Entry" form (`app/add-entry/page.tsx`)
@@ -138,9 +141,10 @@ Restart the dev server after editing `.env.local`.
 #### B) Generate AI insights
 - UI: `app/ai-insights/page.tsx`
   - Button triggers `POST /api/insights`
-  - Displays current insights + insight history
+  - Displays structured current report + insight history
+  - Shows source badges (`OpenAI` or `Fallback`) and fallback reason in dev
 - Backend: `app/api/insights/route.ts`
-  - `POST /api/insights` generates insights and also saves them
+  - `POST /api/insights` generates a structured report and saves it
   - `GET /api/insights` loads insight history
 - Storage: `lib/insights-store.ts` writes to `data/insights.json`
 
@@ -185,11 +189,13 @@ Below is the learning journey at a "feature level" (with references to files):
 
 ### Step 5 - AI insights feature (local fallback)
 - `app/api/insights/route.ts`
-  - Generated "mentor style" insights (rules-based)
+  - Generated "mentor style" insights (rules-based fallback)
 
 ### Step 6 - Add OpenAI integration (optional)
 - `app/api/insights/route.ts` calls OpenAI only if `OPENAI_API_KEY` exists
 - If it fails, it falls back to local insight logic
+- UI now shows whether each insight came from `OpenAI` or `Fallback`
+- If quota is insufficient, the UI shows a clear note and keeps fallback active
 
 ### Step 7 - Persistent storage for entries
 - Moved from in-memory to file persistence:
@@ -203,9 +209,9 @@ Below is the learning journey at a "feature level" (with references to files):
 - `PUT /api/entries`
 - Added inline edit mode per entry
 
-### Step 10 - Search, tags, filter, sort
+### Step 10 - Search, filter, sort
 - Search/filter controls and client-side filtering logic in UI
-- Tag extraction from text (simple keyword logic)
+- Dashboard entry tags were later removed to reduce visual noise
 
 ### Step 11 - Date range + sorting
 - UI controls:
@@ -213,13 +219,14 @@ Below is the learning journey at a "feature level" (with references to files):
   - "All time / Last 7 days / Last 30 days"
 
 ### Step 12 - Insight history panel
-- UI shows:
-  - current insight
-  - history list
+- UI now shows:
+  - current structured report (summary, metrics, patterns, risks, recommendations)
+  - history list with expandable cards
 
 ### Step 13 - Persist insight history
 - `lib/insights-store.ts` → `data/insights.json`
 - `GET /api/insights` loads history
+- Backward-compatible normalization supports older text-only insight records
 
 ### Step 14 - Export JSON data
 - `GET /api/export`
@@ -236,6 +243,11 @@ Below is the learning journey at a "feature level" (with references to files):
   - `components/StatsCard.tsx`
   - `components/EntryCard.tsx`
   - `components/InsightCard.tsx`
+  - `components/InsightsSummaryCard.tsx`
+  - `components/InsightMetricsCard.tsx`
+  - `components/InsightListCard.tsx`
+- Add Entry and Dashboard received additional UI polish (layout hierarchy, guidance, improved empty states)
+- Date/time display was standardized to Kenya time (`Africa/Nairobi`) for entries and insights
 
 ---
 
